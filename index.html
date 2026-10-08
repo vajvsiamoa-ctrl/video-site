@@ -6,6 +6,10 @@
 
     <title>VideoHub</title>
 
+    <link rel="preconnect" href="https://tv1.indoav.app">
+    <link rel="dns-prefetch" href="https://tv1.indoav.app">
+    <link rel="preconnect" href="https://abacus.jasoncameron.dev">
+
     <style>
         * {
             box-sizing: border-box;
@@ -19,13 +23,13 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        /* Header */
         header {
             height: 64px;
             background: #151518;
             border-bottom: 1px solid #29292d;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 22px;
             position: sticky;
             top: 0;
@@ -42,7 +46,11 @@
             color: #ff3b5c;
         }
 
-        /* Main */
+        .visits {
+            color: #aaa;
+            font-size: 13px;
+        }
+
         main {
             width: 100%;
             max-width: 1050px;
@@ -62,19 +70,57 @@
             gap: 22px;
         }
 
-        /* Video card */
         .video-card {
             background: #151518;
             border: 1px solid #29292d;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 30px rgba(0,0,0,.35);
+            content-visibility: auto;
+            contain-intrinsic-size: 400px;
         }
 
         .video-wrapper {
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: #000;
+            background: radial-gradient(circle at center, #26262c 0%, #0e0e11 100%);
+            position: relative;
+        }
+
+        .play-btn {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #ff3b5c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 24px rgba(255,59,92,.45);
+            transition: transform .15s ease;
+        }
+
+        .play-btn:hover .play-circle {
+            transform: scale(1.08);
+        }
+
+        .play-circle svg {
+            width: 30px;
+            height: 30px;
+            fill: #fff;
+            margin-left: 4px;
         }
 
         iframe {
@@ -99,7 +145,41 @@
             font-size: 13px;
         }
 
-        /* Footer */
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 14px;
+            background: #151518;
+            color: #fff;
+            border: 1px solid #29292d;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #ff3b5c;
+        }
+
+        .pagination button.active {
+            background: #ff3b5c;
+            border-color: #ff3b5c;
+            font-weight: 700;
+        }
+
+        .pagination button:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
         footer {
             text-align: center;
             color: #666;
@@ -108,41 +188,18 @@
             border-top: 1px solid #222;
         }
 
-        /* Mobile */
         @media (max-width: 600px) {
-
-            header {
-                height: 56px;
-                padding: 0 15px;
-            }
-
-            .logo {
-                font-size: 19px;
-            }
-
-            main {
-                padding: 18px 10px 35px;
-            }
-
-            .section-title {
-                font-size: 18px;
-            }
-
-            #videos {
-                gap: 16px;
-            }
-
-            .video-card {
-                border-radius: 8px;
-            }
-
-            .video-info {
-                padding: 12px;
-            }
-
-            .video-title {
-                font-size: 15px;
-            }
+            header { height: 56px; padding: 0 15px; }
+            .logo { font-size: 19px; }
+            .visits { font-size: 12px; }
+            main { padding: 18px 10px 35px; }
+            .section-title { font-size: 18px; }
+            #videos { gap: 16px; }
+            .video-card { border-radius: 8px; }
+            .play-circle { width: 58px; height: 58px; }
+            .video-info { padding: 12px; }
+            .video-title { font-size: 15px; }
+            .pagination button { min-width: 36px; height: 36px; padding: 0 10px; }
         }
     </style>
 </head>
@@ -150,26 +207,26 @@
 <body>
 
     <header>
-        <div class="logo">
-            Video<span>Hub</span>
-        </div>
+        <div class="logo">Video<span>Hub</span></div>
+        <div class="visits" id="visits"></div>
     </header>
 
     <main>
-
-        <div class="section-title">
-            Latest Videos
-        </div>
-
+        <div class="section-title">Latest Videos</div>
         <div id="videos"></div>
-
+        <div class="pagination" id="pagination"></div>
     </main>
 
-    <footer>
-        © 2026 VideoHub
-    </footer>
+    <footer>© 2026 VideoHub</footer>
 
     <script>
+        /* ========= الإعدادات ========= */
+        const PER_PAGE = 12; // عدد الفيديوهات في الصفحة
+
+        // اسم خاص بموقعك للعدادات (متغيروش بعد ما تنشر الموقع وإلا الأرقام هتبدأ من الصفر)
+        const NAMESPACE = "videohub-k7q2x9";
+        const COUNTER_API = "https://abacus.jasoncameron.dev";
+
         // أضف أي فيديو جديد هنا: حط الـ ID بس (الجزء اللي بعد /e/)
         const videoIds = [
             "M63O5nDB3ebR", "mJUEEbcBRTIw", "HHxlvVwxS1x3", "e6F0xlxW2rZz", "pfCw8aIr1eGN",
@@ -190,26 +247,142 @@
             "aruGtQpIDlJN", "s4j3OS095oZO", "qlfKHyttc1b7"
         ];
 
-        const container = document.getElementById("videos");
+        /* ========= العدادات ========= */
+        const stats = {};
+        const fmt = n => Number(n || 0).toLocaleString("en-US");
 
-        videoIds.forEach((id, i) => {
-            const num = String(i + 1).padStart(2, "0");
-            const card = document.createElement("div");
-            card.className = "video-card";
-            card.innerHTML = `
-                <div class="video-wrapper">
-                    <iframe
-                        src="https://tv1.indoav.app/e/${id}"
-                        loading="lazy"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <div class="video-info">
-                    <div class="video-title">Video ${num}</div>
-                    <div class="video-meta">Watch video</div>
-                </div>`;
-            container.appendChild(card);
+        async function counterRequest(action, key) {
+            try {
+                const res = await fetch(`${COUNTER_API}/${action}/${NAMESPACE}/${key}`);
+                if (!res.ok) return 0;
+                const data = await res.json();
+                return Number(data.value) || 0;
+            } catch (e) {
+                return null; // فشل الاتصال
+            }
+        }
+
+        function updateViewsUI() {
+            document.querySelectorAll("[data-views]").forEach(el => {
+                const v = stats[el.dataset.views];
+                el.textContent = "👁 " + fmt(v) + " views";
+            });
+            if (stats.site !== undefined) {
+                document.getElementById("visits").textContent = "👥 " + fmt(stats.site) + " visits";
+            }
+        }
+
+        // يجيب أرقام الفيديوهات الظاهرة في الصفحة بس
+        async function loadPageStats(ids) {
+            await Promise.all(ids.map(async id => {
+                if (stats[id] !== undefined) return;
+                const v = await counterRequest("get", id);
+                if (v !== null) stats[id] = v;
+            }));
+            updateViewsUI();
+        }
+
+        // زيارة الموقع: بتتسجل مرة واحدة لكل جلسة (الرفرش مبيزودهاش)
+        async function trackVisit() {
+            const first = !sessionStorage.getItem("visited");
+            if (first) sessionStorage.setItem("visited", "1");
+            const v = await counterRequest(first ? "hit" : "get", "site");
+            if (v !== null) { stats.site = v; updateViewsUI(); }
+        }
+
+        // مشاهدة الفيديو: بتتسجل مرة واحدة لكل فيديو في الجلسة
+        async function trackPlay(id) {
+            const key = "played_" + id;
+            if (sessionStorage.getItem(key)) return;
+            sessionStorage.setItem(key, "1");
+            const v = await counterRequest("hit", id);
+            if (v !== null) { stats[id] = v; updateViewsUI(); }
+        }
+
+        /* ========= العرض ========= */
+        const totalPages = Math.ceil(videoIds.length / PER_PAGE);
+        const container = document.getElementById("videos");
+        const pagination = document.getElementById("pagination");
+
+        const PLAY_ICON = '<div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+
+        function getPageFromUrl() {
+            const p = parseInt(new URLSearchParams(location.search).get("page"), 10);
+            return p >= 1 && p <= totalPages ? p : 1;
+        }
+
+        function renderVideos(page) {
+            container.innerHTML = "";
+            const start = (page - 1) * PER_PAGE;
+            const pageIds = videoIds.slice(start, start + PER_PAGE);
+
+            pageIds.forEach((id, i) => {
+                const num = String(start + i + 1).padStart(2, "0");
+                const card = document.createElement("div");
+                card.className = "video-card";
+                card.innerHTML =
+                    '<div class="video-wrapper" data-id="' + id + '">' +
+                        '<button class="play-btn" aria-label="Play video ' + num + '">' + PLAY_ICON + '</button>' +
+                    '</div>' +
+                    '<div class="video-info">' +
+                        '<div class="video-title">Video ' + num + '</div>' +
+                        '<div class="video-meta"><span data-views="' + id + '">👁 ' +
+                        (stats[id] !== undefined ? fmt(stats[id]) : "...") + ' views</span></div>' +
+                    '</div>';
+                container.appendChild(card);
+            });
+
+            loadPageStats(pageIds);
+        }
+
+        // الدوس على الكارت: يحمّل الفيديو ويسجل المشاهدة
+        container.addEventListener("click", function (e) {
+            const btn = e.target.closest(".play-btn");
+            if (!btn) return;
+            const wrapper = btn.parentElement;
+            const id = wrapper.dataset.id;
+            wrapper.innerHTML =
+                '<iframe src="https://tv1.indoav.app/e/' + id + '" ' +
+                'allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+            trackPlay(id);
         });
+
+        function renderPagination(page) {
+            pagination.innerHTML = "";
+
+            function makeBtn(label, target, opts) {
+                opts = opts || {};
+                const b = document.createElement("button");
+                b.textContent = label;
+                if (opts.active) b.classList.add("active");
+                if (opts.disabled) b.disabled = true;
+                b.onclick = function () { goToPage(target); };
+                pagination.appendChild(b);
+            }
+
+            makeBtn("« Prev", page - 1, { disabled: page === 1 });
+            for (let p = 1; p <= totalPages; p++) {
+                makeBtn(p, p, { active: p === page });
+            }
+            makeBtn("Next »", page + 1, { disabled: page === totalPages });
+        }
+
+        function goToPage(page) {
+            history.pushState({}, "", "?page=" + page);
+            showPage(page);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function showPage(page) {
+            renderVideos(page);
+            renderPagination(page);
+        }
+
+        window.addEventListener("popstate", function () { showPage(getPageFromUrl()); });
+
+        /* ========= التشغيل ========= */
+        showPage(getPageFromUrl());
+        trackVisit();
     </script>
 
 </body>
