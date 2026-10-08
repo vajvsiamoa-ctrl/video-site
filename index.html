@@ -56,6 +56,12 @@
             margin-bottom: 16px;
         }
 
+        #videos {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
         /* Video card */
         .video-card {
             background: #151518;
@@ -122,6 +128,10 @@
                 font-size: 18px;
             }
 
+            #videos {
+                gap: 16px;
+            }
+
             .video-card {
                 border-radius: 8px;
             }
@@ -151,32 +161,56 @@
             Latest Videos
         </div>
 
-        <div class="video-card">
-
-            <div class="video-wrapper">
-                <iframe
-                    src="https://tv1.indoav.app/e/M63O5nDB3ebR"
-                    allowfullscreen>
-                </iframe>
-            </div>
-
-            <div class="video-info">
-                <div class="video-title">
-                    Video 01
-                </div>
-
-                <div class="video-meta">
-                    Watch video
-                </div>
-            </div>
-
-        </div>
+        <div id="videos"></div>
 
     </main>
 
     <footer>
         © 2026 VideoHub
     </footer>
+
+    <script>
+        // أضف أي فيديو جديد هنا: حط الـ ID بس (الجزء اللي بعد /e/)
+        const videoIds = [
+            "M63O5nDB3ebR", "mJUEEbcBRTIw", "HHxlvVwxS1x3", "e6F0xlxW2rZz", "pfCw8aIr1eGN",
+            "KXvA7lwH2PPH", "MvZDN8ZSmogf", "22eRQqfPnUuI", "wJa7wif6Rn8u", "yHXFILt9oA1s",
+            "oVKRkh3J4y7y", "Y621Yu0SwhOo", "CD2fCV9MlUmr", "FHHvWFVgQWEG", "qCDEq4q1PuNx",
+            "3gtGkOMnPmwO", "NnhCvnt3habU", "y8Cz7wgUS7CQ", "wxStXlYOCo8Z", "vb2tg2kJYgqq",
+            "aD8qyzHzFcvw", "XJvnjcterq84", "DSCXT8CRSJE2", "kqJGfVDo8gxo", "uNsER7hAQp2c",
+            "PzA2bpaiBE0X", "14JnFENWO2mY", "GQ52o4jER3Mb", "ZRtBgzo386ot", "WI3LkZ3JzMEX",
+            "cB4Lh1zOGv1C", "SRjGiw6GBx08", "fwMg7Q47X1qH", "OLr07LLWDlyC", "JG05hqc59AnR",
+            "XRYy1EnMyb1r", "DGeTXhpHFQLn", "qiQN5bAyQ8LO", "hKe8myy8oN9o", "Pty9OeO1uBu7",
+            "E88S69k50yAV", "xP7EnHewKtOP", "KjXMPptfAYtN", "piwp2RvnOxS4", "d3UxuyBb6Pu3",
+            "RkZz5ITztRfu", "jOuCy1xMBNTu", "SI21LA7dsNYF", "g7dL8jCEI8zi", "QImCrWSbRI1H",
+            "H21Nw9po5sbr", "OXFxyEwuviK4", "akXhOA6DbKxT", "rOhkNr04AE0q", "ZgaqiiyLP3TR",
+            "8QpABRotycJ6", "TZBTBg8Y4FzB", "3RNwVs9Iw7dd", "bJQhMdRO9HT2", "gSmhTZ1ZAAtA",
+            "s1gbYQwxxVvk", "WiL4OU9qVGGV", "Z9Kcpa8kwk26", "e0LB704TeLcQ", "Kd5IMoTdcPfl",
+            "5bxWyUj2sYyO", "ujoCoO8zaI7h", "jhRLgwCZhi1b", "Hi6wk0ZxAAnX", "uwFwcc31N7mM",
+            "cIxkb65Zv8e4", "CHeWDVRVCrlz", "NtB26toKzhch", "IntcEtQYgcZM", "1yHxWGtQDA3f",
+            "aruGtQpIDlJN", "s4j3OS095oZO", "qlfKHyttc1b7"
+        ];
+
+        const container = document.getElementById("videos");
+
+        videoIds.forEach((id, i) => {
+            const num = String(i + 1).padStart(2, "0");
+            const card = document.createElement("div");
+            card.className = "video-card";
+            card.innerHTML = `
+                <div class="video-wrapper">
+                    <iframe
+                        src="https://tv1.indoav.app/e/${id}"
+                        loading="lazy"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">Video ${num}</div>
+                    <div class="video-meta">Watch video</div>
+                </div>`;
+            container.appendChild(card);
+        });
+    </script>
 
 </body>
 </html>
