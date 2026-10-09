@@ -105,7 +105,7 @@
         }
 
         .video-meta {
-            margin-top: 7px;
+            margin-top: 0;
             color: #888;
             font-size: 13px;
         }
@@ -200,22 +200,30 @@
 
         // أضف أي فيديو جديد هنا: حط الـ ID بس (الجزء اللي بعد /e/)
         const videoIds = [
-            "M63O5nDB3ebR", "mJUEEbcBRTIw", "HHxlvVwxS1x3", "e6F0xlxW2rZz", "pfCw8aIr1eGN",
-            "KXvA7lwH2PPH", "MvZDN8ZSmogf", "22eRQqfPnUuI", "wJa7wif6Rn8u", "yHXFILt9oA1s",
-            "oVKRkh3J4y7y", "Y621Yu0SwhOo", "CD2fCV9MlUmr", "FHHvWFVgQWEG", "qCDEq4q1PuNx",
-            "3gtGkOMnPmwO", "NnhCvnt3habU", "y8Cz7wgUS7CQ", "wxStXlYOCo8Z", "vb2tg2kJYgqq",
-            "aD8qyzHzFcvw", "XJvnjcterq84", "DSCXT8CRSJE2", "kqJGfVDo8gxo", "uNsER7hAQp2c",
-            "PzA2bpaiBE0X", "14JnFENWO2mY", "GQ52o4jER3Mb", "ZRtBgzo386ot", "WI3LkZ3JzMEX",
-            "cB4Lh1zOGv1C", "SRjGiw6GBx08", "fwMg7Q47X1qH", "OLr07LLWDlyC", "JG05hqc59AnR",
-            "XRYy1EnMyb1r", "DGeTXhpHFQLn", "qiQN5bAyQ8LO", "hKe8myy8oN9o", "Pty9OeO1uBu7",
-            "E88S69k50yAV", "xP7EnHewKtOP", "KjXMPptfAYtN", "piwp2RvnOxS4", "d3UxuyBb6Pu3",
-            "RkZz5ITztRfu", "jOuCy1xMBNTu", "SI21LA7dsNYF", "g7dL8jCEI8zi", "QImCrWSbRI1H",
-            "H21Nw9po5sbr", "OXFxyEwuviK4", "akXhOA6DbKxT", "rOhkNr04AE0q", "ZgaqiiyLP3TR",
-            "8QpABRotycJ6", "TZBTBg8Y4FzB", "3RNwVs9Iw7dd", "bJQhMdRO9HT2", "gSmhTZ1ZAAtA",
-            "s1gbYQwxxVvk", "WiL4OU9qVGGV", "Z9Kcpa8kwk26", "e0LB704TeLcQ", "Kd5IMoTdcPfl",
-            "5bxWyUj2sYyO", "ujoCoO8zaI7h", "jhRLgwCZhi1b", "Hi6wk0ZxAAnX", "uwFwcc31N7mM",
-            "cIxkb65Zv8e4", "CHeWDVRVCrlz", "NtB26toKzhch", "IntcEtQYgcZM", "1yHxWGtQDA3f",
-            "aruGtQpIDlJN", "s4j3OS095oZO", "qlfKHyttc1b7"
+            "BFx6MFJazkX5", "pdQPpKIXzClX", "M63O5nDB3ebR", "mJUEEbcBRTIw", "HHxlvVwxS1x3",
+            "e6F0xlxW2rZz", "pfCw8aIr1eGN", "KXvA7lwH2PPH", "MvZDN8ZSmogf", "22eRQqfPnUuI",
+            "wJa7wif6Rn8u", "yHXFILt9oA1s", "oVKRkh3J4y7y", "Y621Yu0SwhOo", "CD2fCV9MlUmr",
+            "FHHvWFVgQWEG", "qCDEq4q1PuNx", "3gtGkOMnPmwO", "NnhCvnt3habU", "y8Cz7wgUS7CQ",
+            "wxStXlYOCo8Z", "vb2tg2kJYgqq", "aD8qyzHzFcvw", "XJvnjcterq84", "DSCXT8CRSJE2",
+            "kqJGfVDo8gxo", "uNsER7hAQp2c", "PzA2bpaiBE0X", "14JnFENWO2mY", "GQ52o4jER3Mb",
+            "ZRtBgzo386ot", "WI3LkZ3JzMEX", "cB4Lh1zOGv1C", "SRjGiw6GBx08", "fwMg7Q47X1qH",
+            "OLr07LLWDlyC", "JG05hqc59AnR", "XRYy1EnMyb1r", "DGeTXhpHFQLn", "qiQN5bAyQ8LO",
+            "hKe8myy8oN9o", "Pty9OeO1uBu7", "E88S69k50yAV", "xP7EnHewKtOP", "KjXMPptfAYtN",
+            "piwp2RvnOxS4", "d3UxuyBb6Pu3", "RkZz5ITztRfu", "jOuCy1xMBNTu", "SI21LA7dsNYF",
+            "g7dL8jCEI8zi", "QImCrWSbRI1H", "H21Nw9po5sbr", "OXFxyEwuviK4", "akXhOA6DbKxT",
+            "rOhkNr04AE0q", "ZgaqiiyLP3TR", "8QpABRotycJ6", "TZBTBg8Y4FzB", "3RNwVs9Iw7dd",
+            "bJQhMdRO9HT2", "gSmhTZ1ZAAtA", "s1gbYQwxxVvk", "WiL4OU9qVGGV", "Z9Kcpa8kwk26",
+            "e0LB704TeLcQ", "Kd5IMoTdcPfl", "5bxWyUj2sYyO", "ujoCoO8zaI7h", "jhRLgwCZhi1b",
+            "Hi6wk0ZxAAnX", "uwFwcc31N7mM", "cIxkb65Zv8e4", "CHeWDVRVCrlz", "NtB26toKzhch",
+            "IntcEtQYgcZM", "1yHxWGtQDA3f", "aruGtQpIDlJN", "s4j3OS095oZO", "qlfKHyttc1b7",
+            "eMZieEvwSHp7", "RQRBhQnNcQEU", "ewuc89RfycN5", "BE1DuA5AtReR", "wccrOFVNbtCH",
+            "JQxZFNOkM4cu", "1vE0D4ARrj3X", "t59Np8NFoXix", "avgcxNW1Sfwb", "740RloZJvTpz",
+            "AOO9SLd5XGlA", "s60soJyRqdNY", "nwETBEsy0CN2", "zCYYtpOC5rZF", "M05UrMAI7cln",
+            "ZlX2ErsVIqTf", "N083LZxnV25q", "UJwXNjaw20NH", "0T0osBNJxPMX", "t2tN2PIGCuyw",
+            "lO8A8Jkayegg", "8t4qd3gTb4a1", "mhRc0iYtQgj0", "fxA3u7Y4xwMP", "en2MrD0OH8la",
+            "9m1kFyUI2oLF", "nngQDEK5oAFc", "1V9ux0ACKfs1", "U8yEa5DG6SS2", "z0Gjpj7jNvtn",
+            "T2HUuSdMGKv1", "EYopsd7RuyKP", "o6VETLxd8ssr", "E40CZhLiI4cX", "sKnprmFo4Mf0",
+            "zgdynysfmIOL", "cAPVfzGNbkRA", "Us88JXlP4Rfx", "cw9gobfLnzep", "tCDcZUOpRvlt"
         ];
 
         /* ========= العدادات ========= */
@@ -258,8 +266,11 @@
         // زيارة الموقع: مرة واحدة لكل جلسة (الرفرش مبيزودهاش)
         // + جلب إجمالي مرات التشغيل لعرضه في الهيدر
         async function trackVisit() {
-            const first = !sessionStorage.getItem("visited");
-            if (first) sessionStorage.setItem("visited", "1");
+            let first = false;
+            try {
+                first = !sessionStorage.getItem("visited");
+                if (first) sessionStorage.setItem("visited", "1");
+            } catch (e) {}
 
             const results = await Promise.all([
                 counterRequest(first ? "hit" : "get", KEY_SITE),
@@ -275,8 +286,10 @@
         // بتزود عداد الفيديو نفسه + عداد إجمالي التشغيل لكل الفيديوهات
         async function trackPlay(id) {
             const key = "played_" + id;
-            if (sessionStorage.getItem(key)) return;
-            sessionStorage.setItem(key, "1");
+            try {
+                if (sessionStorage.getItem(key)) return;
+                sessionStorage.setItem(key, "1");
+            } catch (e) {}
 
             const results = await Promise.all([
                 counterRequest("hit", id),
@@ -331,7 +344,6 @@
             const pageIds = videoIds.slice(start, start + PER_PAGE);
 
             pageIds.forEach(function (id, i) {
-                const num = String(start + i + 1).padStart(2, "0");
                 const card = document.createElement("div");
                 card.className = "video-card";
                 card.innerHTML =
@@ -340,7 +352,6 @@
                         'loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>' +
                     '</div>' +
                     '<div class="video-info">' +
-                        '<div class="video-title">Video ' + num + '</div>' +
                         '<div class="video-meta"><span data-views="' + id + '">👁 ' +
                         (stats[id] !== undefined ? fmt(stats[id]) : "...") + ' views</span></div>' +
                     '</div>';
@@ -371,7 +382,7 @@
         }
 
         function goToPage(page) {
-            history.pushState({}, "", "?page=" + page);
+            try { history.pushState({}, "", "?page=" + page); } catch (e) {}
             showPage(page);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
