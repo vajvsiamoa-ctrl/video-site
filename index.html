@@ -46,9 +46,13 @@
             color: #ff3b5c;
         }
 
-        .visits {
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             color: #aaa;
             font-size: 13px;
+            white-space: nowrap;
         }
 
         main {
@@ -150,9 +154,9 @@
         }
 
         @media (max-width: 600px) {
-            header { height: 56px; padding: 0 15px; }
+            header { height: 56px; padding: 0 12px; }
             .logo { font-size: 19px; }
-            .visits { font-size: 12px; }
+            .stats { font-size: 11px; gap: 10px; }
             main { padding: 18px 10px 35px; }
             .section-title { font-size: 18px; }
             #videos { gap: 16px; }
@@ -168,7 +172,10 @@
 
     <header>
         <div class="logo">Video<span>Hub</span></div>
-        <div class="visits" id="visits"></div>
+        <div class="stats">
+            <span id="visits"></span>
+            <span id="plays"></span>
+        </div>
     </header>
 
     <main>
@@ -186,6 +193,10 @@
         // اسم خاص بموقعك للعدادات (متغيروش وإلا الأرقام هتبدأ من الصفر)
         const NAMESPACE = "videohub-k7q2x9";
         const COUNTER_API = "https://abacus.jasoncameron.dev";
+
+        // مفاتيح العدادات الإجمالية
+        const KEY_SITE = "site";               // إجمالي الزيارات
+        const KEY_TOTAL_PLAYS = "total_plays"; // إجمالي مرات تشغيل كل الفيديوهات
 
         // أضف أي فيديو جديد هنا: حط الـ ID بس (الجزء اللي بعد /e/)
         const videoIds = [
@@ -227,8 +238,11 @@
                 const v = stats[el.dataset.views];
                 el.textContent = "👁 " + (v !== undefined ? fmt(v) : "...") + " views";
             });
-            if (stats.site !== undefined) {
-                document.getElementById("visits").textContent = "👥 " + fmt(stats.site) + " visits";
+            if (stats[KEY_SITE] !== undefined) {
+                document.getElementById("visits").textContent = "👥 " + fmt(stats[KEY_SITE]) + " visits";
+            }
+            if (stats[KEY_TOTAL_PLAYS] !== undefined) {
+                document.getElementById("plays").textContent = "▶ " + fmt(stats[KEY_TOTAL_PLAYS]) + " plays";
             }
         }
 
@@ -242,31 +256,63 @@
         }
 
         // زيارة الموقع: مرة واحدة لكل جلسة (الرفرش مبيزودهاش)
+        // + جلب إجمالي مرات التشغيل لعرضه في الهيدر
         async function trackVisit() {
             const first = !sessionStorage.getItem("visited");
             if (first) sessionStorage.setItem("visited", "1");
-            const v = await counterRequest(first ? "hit" : "get", "site");
-            if (v !== null) { stats.site = v; updateViewsUI(); }
+
+            const results = await Promise.all([
+                counterRequest(first ? "hit" : "get", KEY_SITE),
+                counterRequest("get", KEY_TOTAL_PLAYS)
+            ]);
+
+            if (results[0] !== null) stats[KEY_SITE] = results[0];
+            if (results[1] !== null) stats[KEY_TOTAL_PLAYS] = results[1];
+            updateViewsUI();
         }
 
         // مشاهدة الفيديو: مرة واحدة لكل فيديو في الجلسة
+        // بتزود عداد الفيديو نفسه + عداد إجمالي التشغيل لكل الفيديوهات
         async function trackPlay(id) {
             const key = "played_" + id;
             if (sessionStorage.getItem(key)) return;
             sessionStorage.setItem(key, "1");
-            const v = await counterRequest("hit", id);
-            if (v !== null) { stats[id] = v; updateViewsUI(); }
+
+            const results = await Promise.all([
+                counterRequest("hit", id),
+                counterRequest("hit", KEY_TOTAL_PLAYS)
+            ]);
+
+            if (results[0] !== null) stats[id] = results[0];
+            if (results[1] !== null) stats[KEY_TOTAL_PLAYS] = results[1];
+            updateViewsUI();
         }
 
-        // لما الزائر يضغط جوه الفيديو، الصفحة بتفقد التركيز (blur) والـ iframe بياخده
-        window.addEventListener("blur", function () {
-            setTimeout(function () {
-                const el = document.activeElement;
-                if (el && el.tagName === "IFRAME" && el.dataset.id) {
+        /* ========= اكتشاف التشغيل =========
+           الـ iframe من دومين تاني فمقدرش أقرأ حالة المشغل،
+           فبنعتبر الضغط جوه الفيديو = تشغيل.
+           الاكتشاف بيتم بطريقتين:
+           1) blur: لما الزائر يضغط على iframe الصفحة بتفقد التركيز
+           2) polling خفيف: عشان نلقط الانتقال من فيديو لفيديو تاني
+              (في الحالة دي حدث blur مبيحصلش) */
+        let lastFocusedId = null;
+
+        function checkIframeFocus() {
+            const el = document.activeElement;
+            if (el && el.tagName === "IFRAME" && el.dataset.id) {
+                if (el.dataset.id !== lastFocusedId) {
+                    lastFocusedId = el.dataset.id;
                     trackPlay(el.dataset.id);
                 }
-            }, 0);
+            } else {
+                lastFocusedId = null;
+            }
+        }
+
+        window.addEventListener("blur", function () {
+            setTimeout(checkIframeFocus, 0);
         });
+        setInterval(checkIframeFocus, 400);
 
         /* ========= العرض ========= */
         const totalPages = Math.ceil(videoIds.length / PER_PAGE);
@@ -280,6 +326,7 @@
 
         function renderVideos(page) {
             container.innerHTML = "";
+            lastFocusedId = null;
             const start = (page - 1) * PER_PAGE;
             const pageIds = videoIds.slice(start, start + PER_PAGE);
 
