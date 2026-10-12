@@ -231,6 +231,12 @@
             "zgdynysfmIOL", "cAPVfzGNbkRA", "Us88JXlP4Rfx", "cw9gobfLnzep", "tCDcZUOpRvlt"
         ];
 
+        // خلط عشوائي للفيديوهات مع كل تحميل للصفحة (Fisher-Yates)
+        for (let i = videoIds.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [videoIds[i], videoIds[j]] = [videoIds[j], videoIds[i]];
+        }
+
         /* ========= العدادات ========= */
         const stats = {};
         const fmt = n => Number(n || 0).toLocaleString("en-US");
